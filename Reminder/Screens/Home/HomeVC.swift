@@ -73,13 +73,19 @@ class HomeVC: UIViewController {
     
     private var welcomeLabel: UILabel = {
         let label = UILabel()
-        label.text = "Welcome to Reminder"
-        label.font = .systemFont(ofSize: 30, weight: .bold)
+        label.text = "Good Morning Sami"
+        label.font = .systemFont(ofSize: 28, weight: .bold)
         label.textColor = .label
-        label.textAlignment = .center
+        label.textAlignment = .left
         return label
     }()
     
+    private let calendarButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setImage(UIImage(systemName: "calendar"), for: .normal)
+        button.tintColor = .label
+        return button
+    }()
     
     
     private lazy var taskCollectionView: UICollectionView = {
@@ -97,15 +103,24 @@ class HomeVC: UIViewController {
     }()
     
     private var addButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
-        button.tintColor = .systemBlue
-        button.clipsToBounds = true
-        button.imageView?.contentMode = .scaleAspectFit
-        button.contentVerticalAlignment = .fill
-        button.contentHorizontalAlignment = .fill
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(systemName: "plus"), for: .normal)
+        button.backgroundColor = .black
+        button.tintColor = .white
+        button.layer.cornerRadius = 32
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowOpacity = 0.3
+        button.layer.shadowOffset = CGSize(width: 0, height: 2)
+        button.layer.shadowRadius = 4
         button.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
         return button
+    }()
+    
+    private lazy var welcomeStack: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [welcomeLabel, calendarButton])
+        stack.axis = .horizontal
+        stack.distribution = .equalSpacing
+        return stack
     }()
     
     // MARK: - Actions
@@ -144,11 +159,10 @@ class HomeVC: UIViewController {
             taskCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             taskCollectionView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.65),
             
-            addButton.widthAnchor.constraint(equalToConstant: 80),
-            addButton.heightAnchor.constraint(equalToConstant: 80),
-            addButton.topAnchor.constraint(equalTo: taskCollectionView.bottomAnchor, constant: 16),
-            addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            addButton.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
+            addButton.widthAnchor.constraint(equalToConstant: 64),
+            addButton.heightAnchor.constraint(equalToConstant: 64),
+            addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -20),
+            addButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20)
         ])
         
         /*
@@ -195,9 +209,19 @@ extension HomeVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource
             formatter.dateFormat = "dd MMMM"
             content.text = formatter.string(from: date)
             content.textProperties.alignment = .center
-            content.textProperties.color = .label
             content.textProperties.numberOfLines = 0
-            content.textProperties.font = .systemFont(ofSize: 13, weight: .regular)
+            
+            let isPast = date < Date().startOfDay()
+            
+            if isPast {
+                content.textProperties.color = .lightGray
+            } else if Calendar.current.isDate(date, inSameDayAs: homeVM.selectedDate ?? Date()) {
+                content.textProperties.color = .label
+                content.textProperties.font = .boldSystemFont(ofSize: 14)
+            } else {
+                content.textProperties.color = .darkGray
+            }
+            
             cell.contentConfiguration = content
             return cell
         } else {
@@ -215,6 +239,13 @@ extension HomeVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource
             let width = collectionView.bounds.width
             return CGSize(width: width, height: 80)
         }
+    }
+}
+
+extension HomeVC: TaskCellDelegate {
+    func didToggleTaskCompletion(_ task: Task) {
+        homeVM.updateTask(task)
+        taskCollectionView.reloadData()
     }
 }
 

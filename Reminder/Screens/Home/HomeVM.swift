@@ -13,6 +13,7 @@ protocol HomeVMProtocol {
     var selectedDate: Date? { get set }
     var tasksForSelectedDate: [Task] { get }
     
+    func updateTask(_ task: Task)
     func loadAvailableDates(for numberOfDays: Int)
     func updateSelectedDate(at index: Int)
     func loadTasksFromStorage()
@@ -74,6 +75,11 @@ final class HomeVM: HomeVMProtocol {
     
     func addNewTask(_ task: Task) {
         storageService.insert(task)
+        loadTasksFromStorage()
+    }
+    
+    func updateTask(_ task: Task) {
+        storageService.update(task)
         loadTasksFromStorage()
     }
     
