@@ -10,7 +10,7 @@ import UIKit
 class TaskCollectionViewCell: UICollectionViewCell {
     
     static let reuseIdentifier = "TaskCell"
-    
+    private var task: Task?
     private let taskTitleLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 16, weight: .medium)
@@ -89,16 +89,21 @@ class TaskCollectionViewCell: UICollectionViewCell {
     
     @objc private func checkboxTapped() {
         checkboxButton.isSelected.toggle()
+        guard var task = self.task else { return }
+        task.isCompleted = checkboxButton.isSelected
+        task.time = task.isCompleted ? Date() : nil
+        TaskStorageService().update(task)
     }
     
     func configure(with task: Task) {
+        self.task = task
         taskTitleLabel.text = task.title
         taskDescriptionLabel.text = task.notes
         taskTimeLabel.text = ""
         checkboxButton.isSelected = task.isCompleted
         
         if task.isCompleted {
-            if let completionTime = task.time as? Date {
+            if let completionTime = task.time {
                 let formatter = DateFormatter()
                 formatter.dateFormat = "h:mm a"
                 taskTimeLabel.text = "completed in \(formatter.string(from: completionTime))"

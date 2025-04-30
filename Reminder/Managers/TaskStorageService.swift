@@ -11,7 +11,6 @@ final class TaskStorageService {
         }
     }
     
-    
     func retrieve() -> [Task] {
         let decoder = JSONDecoder()
         guard let savedData = UserDefaults.standard.data(forKey: storageKey),
@@ -21,13 +20,19 @@ final class TaskStorageService {
         return decodedTasks
     }
     
-    
     func insert(_ task: Task) {
         var tasks = retrieve()
         tasks.append(task)
         store(tasks)
     }
-    
+
+    func update(_ updatedTask: Task) {
+        var tasks = retrieve()
+        if let index = tasks.firstIndex(where: { $0.id == updatedTask.id }) {
+            tasks[index] = updatedTask
+            store(tasks)
+        }
+    }
     
     func deleteTask(with id: UUID) {
         var tasks = retrieve()

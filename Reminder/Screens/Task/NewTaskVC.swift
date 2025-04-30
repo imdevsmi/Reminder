@@ -126,7 +126,8 @@ class NewTaskVC: UIViewController {
     
     private lazy var newTaskTextField: UITextField = {
         let textField = UITextField()
-        textField.placeholder = "Enter task here..."
+        textField.placeholder = "Here will be the text of the new task."
+        textField.font = .systemFont(ofSize: 16, weight: .regular)
         textField.textColor = .secondaryLabel
         textField.font = .preferredFont(forTextStyle: .body)
         textField.translatesAutoresizingMaskIntoConstraints = false
@@ -140,7 +141,7 @@ class NewTaskVC: UIViewController {
         button.backgroundColor = .black
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(saveTaskButtonTrapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(saveTaskButtonTapped), for: .touchUpInside)
         return button
     }()
     
@@ -201,20 +202,24 @@ class NewTaskVC: UIViewController {
         
     }
     
-    @objc private func saveTaskButtonTrapped() {
+    @objc private func saveTaskButtonTapped() {
         let name = newTaskTextField.text ?? ""
-        let detail:String? = nil
+        let detail: String? = nil
         let date = taskDatePicker.date
         let time = taskDatePicker.date
-        
-        guard !name.trimmingCharacters(in: .whitespaces).isEmpty  else {
+
+        guard !name.trimmingCharacters(in: .whitespaces).isEmpty else {
             let alert = UIAlertController(title: "Missing Name", message: "Please enter a task name", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
             return
         }
-        
+
         viewModelNewTask.addTask(name: name, detail: detail, date: date, time: time)
+
+       
+        NotificationCenter.default.post(name: .didAddNewTask, object: nil)
+
         dismiss(animated: true)
     }
     

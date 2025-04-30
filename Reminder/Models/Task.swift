@@ -13,7 +13,7 @@ struct Task: Codable, Identifiable, Equatable {
     var title: String
     var notes: String? // task detail
     var date: Date
-    var time: Date
+    var time: Date?
     var isCompleted: Bool
     
     init (id: UUID = UUID(),
