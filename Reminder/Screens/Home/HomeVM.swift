@@ -45,13 +45,16 @@ final class HomeVM: HomeVMProtocol {
     }
     
     var greetingText: String {
+        let name = UserDefaults.standard.string(forKey: "userName") ?? "Sami"
         let hour = Calendar.current.component(.hour, from: Date())
+        let greeting: String
         switch hour {
-        case 6..<12: return "Good Morning!"
-        case 12..<17: return "Good Afternoon!"
-        case 17..<21: return "Good Evening!"
-        default: return "Good Night!"
+        case 6..<12: greeting = "Good Morning"
+        case 12..<17: greeting = "Good Afternoon"
+        case 17..<21: greeting = "Good Evening"
+        default: greeting = "Good Night"
         }
+        return "\(greeting) \(name)!"
     }
     
     // MARK: - Public Methods
@@ -59,11 +62,12 @@ final class HomeVM: HomeVMProtocol {
     func loadAvailableDates(for numberOfDays: Int) {
         let calendar = Calendar.current
         let today = Date()
-        availableDates = (0..<numberOfDays).compactMap {
-            calendar.date(byAdding: .day, value: $0, to: today)
+        let startDay = calendar.date(byAdding: .day, value: -3, to: today)! 
+        
+        availableDates = (0..<(numberOfDays + 3)).compactMap {
+            calendar.date(byAdding: .day, value: $0, to: startDay)
         }
     }
-    
     func updateSelectedDate(at index: Int) {
         guard availableDates.indices.contains(index) else { return }
         selectedDate = availableDates[index]

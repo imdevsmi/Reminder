@@ -33,6 +33,17 @@ class HomeVC: UIViewController {
         welcomeLabel.text = homeVM.greetingText
         dateCollectionView.reloadData()
         taskCollectionView.reloadData()
+        
+        greetingStackView.addArrangedSubview(welcomeLabel)
+        greetingStackView.addArrangedSubview(calendarButton)
+
+        view.addSubview(greetingStackView)
+
+        NSLayoutConstraint.activate([
+            greetingStackView.topAnchor.constraint(equalTo: dateCollectionView.bottomAnchor, constant: 16),
+            greetingStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            greetingStackView.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -16)
+        ])
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -82,9 +93,22 @@ class HomeVC: UIViewController {
     
     private let calendarButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setImage(UIImage(systemName: "calendar"), for: .normal)
-        button.tintColor = .label
+        let config = UIImage.SymbolConfiguration(pointSize: 25, weight: .medium)
+        let image = UIImage(systemName: "calendar", withConfiguration: config)
+        button.setImage(image, for: .normal)
+        button.tintColor = .black
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.addTarget(self, action: #selector(calendarButtonTapped), for: .touchUpInside)
         return button
+    }()
+    
+    private let greetingStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 36
+        stackView.alignment = .center
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        return stackView
     }()
     
     
@@ -104,7 +128,7 @@ class HomeVC: UIViewController {
     
     private var addButton: UIButton = {
         let button = UIButton(type: .custom)
-        button.setImage(UIImage(systemName: "plus"), for: .normal)
+        button.setImage(UIImage(systemName: "plus", withConfiguration: UIImage.SymbolConfiguration(pointSize: 24, weight: .bold)), for: .normal)
         button.backgroundColor = .black
         button.tintColor = .white
         button.layer.cornerRadius = 32
@@ -129,6 +153,10 @@ class HomeVC: UIViewController {
         let addTaskVC = NewTaskVC()
         addTaskVC.modalPresentationStyle = .overFullScreen
         present(addTaskVC, animated: true, completion: nil)
+    }
+    
+    @objc private func calendarButtonTapped() {
+        
     }
     
     // MARK: - Layout
@@ -204,24 +232,26 @@ extension HomeVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource
         if collectionView == dateCollectionView {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell1", for: indexPath)
             let date = homeVM.availableDates[indexPath.item]
+            
             var content = UIListContentConfiguration.cell()
             let formatter = DateFormatter()
-            formatter.dateFormat = "dd MMMM"
+            formatter.dateFormat = "dd MMM"
             content.text = formatter.string(from: date)
             content.textProperties.alignment = .center
-            content.textProperties.numberOfLines = 0
+            content.textProperties.numberOfLines = 1
             
+            let isToday = Calendar.current.isDateInToday(date)
             let isPast = date < Date().startOfDay()
+            let isSelected = Calendar.current.isDate(date, inSameDayAs: homeVM.selectedDate ?? Date())
             
-            if isPast {
-                content.textProperties.color = .lightGray
-            } else if Calendar.current.isDate(date, inSameDayAs: homeVM.selectedDate ?? Date()) {
-                content.textProperties.color = .label
-                content.textProperties.font = .boldSystemFont(ofSize: 14)
+            if isToday {
+                content.textProperties.font = .boldSystemFont(ofSize: 16)
+                content.textProperties.color = .black
             } else {
-                content.textProperties.color = .darkGray
+                content.textProperties.font = .systemFont(ofSize: 16)
+                content.textProperties.color = .lightGray
             }
-            
+
             cell.contentConfiguration = content
             return cell
         } else {
