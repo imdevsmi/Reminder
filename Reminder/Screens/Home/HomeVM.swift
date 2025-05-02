@@ -13,6 +13,8 @@ protocol HomeVMProtocol {
     var selectedDate: Date? { get set }
     var tasksForSelectedDate: [Task] { get }
     
+    var onTasksUpdated: (() -> Void)? { get set }
+
     func updateTask(_ task: Task)
     func loadAvailableDates(for numberOfDays: Int)
     func updateSelectedDate(at index: Int)
@@ -25,10 +27,10 @@ final class HomeVM: HomeVMProtocol {
     
     // MARK: - Dependencies
     
+    var onTasksUpdated: (() -> Void)?
     private let storageService = TaskStorageService()
     
     // MARK: - State
-    
     private var allTasks: [Task] = [] {
         didSet {
             updateTasksForSelectedDate()
@@ -54,7 +56,7 @@ final class HomeVM: HomeVMProtocol {
         case 17..<21: greeting = "Good Evening"
         default: greeting = "Good Night"
         }
-        return "\(greeting) \(name)!"
+        return "\(greeting) \(name)"
     }
     
     // MARK: - Public Methods
@@ -62,7 +64,7 @@ final class HomeVM: HomeVMProtocol {
     func loadAvailableDates(for numberOfDays: Int) {
         let calendar = Calendar.current
         let today = Date()
-        let startDay = calendar.date(byAdding: .day, value: -3, to: today)! 
+        let startDay = calendar.date(byAdding: .day, value: -3, to: today)!
         
         availableDates = (0..<(numberOfDays + 3)).compactMap {
             calendar.date(byAdding: .day, value: $0, to: startDay)
@@ -75,8 +77,11 @@ final class HomeVM: HomeVMProtocol {
     
     func loadTasksFromStorage() {
         allTasks = storageService.retrieve()
+        
+        if selectedDate != nil {
+            updateTasksForSelectedDate()
+        }
     }
-    
     func addNewTask(_ task: Task) {
         storageService.insert(task)
         loadTasksFromStorage()

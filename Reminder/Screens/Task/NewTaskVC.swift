@@ -6,15 +6,17 @@
 //
 
 import UIKit
+import SnapKit
 
-
+// MARK: - NewTaskVC
 class NewTaskVC: UIViewController {
     
+    // MARK: - Properties
     private let viewModelNewTask: NewTaskVMProtocol = NewTaskVM()
     private let blurEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemUltraThinMaterial))
     
+    // MARK: - UI Elements
     private lazy var newTaskView: UIView = {
-        
         let view = UIView()
         view.backgroundColor = .white
         view.layer.cornerRadius = 16
@@ -26,7 +28,6 @@ class NewTaskVC: UIViewController {
     }()
     
     private let contentVerticalStackView: UIStackView = {
-        
         let stackView = UIStackView()
         stackView.axis = .vertical
         stackView.alignment = .leading
@@ -36,7 +37,6 @@ class NewTaskVC: UIViewController {
     }()
     
     private let newTaskLabel: UILabel = {
-        
         let label = UILabel()
         label.text = "New Task"
         label.textColor = .black
@@ -103,7 +103,6 @@ class NewTaskVC: UIViewController {
         picker.layer.borderWidth = 1
         picker.tintColor = .label
         picker.layer.cornerRadius = 8
-        
         return picker
     }()
     
@@ -145,17 +144,22 @@ class NewTaskVC: UIViewController {
         return button
     }()
     
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
     }
-    
+
+    // MARK: - UI Setup (SnapKit)
     private func setupUI() {
-        // Add Blur effect to the background
-        blurEffectView.frame = self.view.bounds
-        self.view.addSubview(blurEffectView)
+        view.addSubview(blurEffectView)
+        blurEffectView.frame = view.bounds
+
+        view.addSubview(newTaskView)
         newTaskView.addSubview(contentVerticalStackView)
-       
+        view.addSubview(saveTaskButton)
+        view.addSubview(taskDatePicker)
+
         calendarStackView.addArrangedSubview(calenderIcon)
         calendarStackView.addArrangedSubview(dateLabel)
         
@@ -168,38 +172,35 @@ class NewTaskVC: UIViewController {
         contentVerticalStackView.addArrangedSubview(clockStackView)
         contentVerticalStackView.addArrangedSubview(newTaskTextField)
         
+        newTaskView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.equalToSuperview().multipliedBy(0.90)
+            make.height.equalToSuperview().multipliedBy(0.40)
+        }
         
+        contentVerticalStackView.snp.makeConstraints { make in
+            make.top.leading.trailing.equalToSuperview().inset(16)
+        }
         
-        view.addSubview(newTaskView)
-        view.addSubview(saveTaskButton)
-        view.addSubview(taskDatePicker)
+        saveTaskButton.snp.makeConstraints { make in
+            make.bottom.trailing.equalTo(newTaskView).inset(16)
+            make.height.equalTo(newTaskView).multipliedBy(0.09)
+            make.width.equalTo(newTaskView).multipliedBy(0.20)
+        }
         
-        NSLayoutConstraint.activate([
-            newTaskView.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.90),
-            newTaskView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.40),
-            newTaskView.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            newTaskView.centerYAnchor.constraint(equalTo: self.view.centerYAnchor),
-            
-            contentVerticalStackView.topAnchor.constraint(equalTo: newTaskView.topAnchor, constant: 16),
-            contentVerticalStackView.leadingAnchor.constraint(equalTo: newTaskView.leadingAnchor, constant: 16),
-            contentVerticalStackView.trailingAnchor.constraint(equalTo: newTaskView.trailingAnchor, constant: -16),
-            
-            saveTaskButton.bottomAnchor.constraint(equalTo: newTaskView.bottomAnchor, constant: -16),
-            saveTaskButton.trailingAnchor.constraint(equalTo: newTaskView.trailingAnchor, constant: -16),
-            saveTaskButton.heightAnchor.constraint(equalTo: newTaskView.heightAnchor, multiplier: 0.09),
-            saveTaskButton.widthAnchor.constraint(equalTo: newTaskView.widthAnchor, multiplier: 0.20),
-            
-            taskDatePicker.topAnchor.constraint(equalTo: calendarStackView.bottomAnchor, constant: 8),
-            taskDatePicker.leadingAnchor.constraint(equalTo: newTaskView.leadingAnchor),
-            taskDatePicker.trailingAnchor.constraint(equalTo: newTaskView.trailingAnchor, constant: -48)])
+        taskDatePicker.snp.makeConstraints { make in
+            make.top.equalTo(calendarStackView.snp.bottom).offset(8)
+            make.leading.equalTo(newTaskView)
+            make.trailing.equalTo(newTaskView).offset(-48)
+        }
     }
     
+    // MARK: - Actions
     @objc func dateChanged(_ sender: UIDatePicker) {
         let formatter = DateFormatter()
         formatter.dateFormat = "E, d MMMM"
         dateLabel.text = formatter.string(from: sender.date)
         taskDatePicker.date = sender.date
-        
     }
     
     @objc private func saveTaskButtonTapped() {
@@ -216,18 +217,11 @@ class NewTaskVC: UIViewController {
         }
 
         viewModelNewTask.addTask(name: name, detail: detail, date: date, time: time)
-
-       
         NotificationCenter.default.post(name: .didAddNewTask, object: nil)
-
         dismiss(animated: true)
     }
     
     @objc func showDatePicker() {
         taskDatePicker.isHidden.toggle()
     }
-}
-
-#Preview {
-    NewTaskVC()
 }

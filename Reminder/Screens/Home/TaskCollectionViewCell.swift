@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SnapKit
 
 class TaskCollectionViewCell: UICollectionViewCell {
     
@@ -13,10 +14,12 @@ class TaskCollectionViewCell: UICollectionViewCell {
     private var task: Task?
     static let reuseIdentifier = "TaskCell"
     
-    private let taskTitleLabel: UILabel = {
+    private var taskTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .medium)
+        label.font = .systemFont(ofSize: 15, weight: .regular)
         label.textColor = .label
+        label.numberOfLines = 0
+        label.textAlignment = .left
         return label
     }()
     
@@ -37,14 +40,20 @@ class TaskCollectionViewCell: UICollectionViewCell {
     }()
     
     private let checkboxButton: UIButton = {
-        
         let button = UIButton(type: .custom)
-        button.setImage(UIImage(systemName: "circle"), for: .normal)
-        button.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .selected)
-        button.tintColor = .systemGray3
+        let normalConfig = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium)
+        let normalImage = UIImage(systemName: "circle", withConfiguration: normalConfig)
+        let selectedConfig = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium, scale: .medium)
+        let selectedImage = UIImage(systemName: "checkmark.circle.fill", withConfiguration: selectedConfig)
+        
+        button.setImage(normalImage, for: .normal)
+        button.setImage(selectedImage, for: .selected)
+        button.tintColor = .black // Tik atılmamış durumda siyah çember
+        button.setPreferredSymbolConfiguration(normalConfig, forImageIn: .normal)
+        button.setPreferredSymbolConfiguration(selectedConfig, forImageIn: .selected)
+        
         return button
     }()
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -55,37 +64,36 @@ class TaskCollectionViewCell: UICollectionViewCell {
     }
     
     private func setupUI() {
-        
         backgroundColor = .systemBackground
-        layer.borderColor = UIColor.systemGray6.cgColor
-        layer.borderWidth = 1
-        layer.cornerRadius = 12
+        layer.cornerRadius = 8
         layer.masksToBounds = true
+        alpha = 1.0
+        
+        layer.borderColor = UIColor.black.cgColor
+        layer.borderWidth = 1
         
         contentView.addSubview(taskTitleLabel)
         contentView.addSubview(taskTimeLabel)
         contentView.addSubview(checkboxButton)
-        
-        taskTitleLabel.translatesAutoresizingMaskIntoConstraints = false
-        taskTimeLabel.translatesAutoresizingMaskIntoConstraints = false
-        checkboxButton.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            checkboxButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            checkboxButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            checkboxButton.widthAnchor.constraint(equalToConstant: 24),
-            checkboxButton.heightAnchor.constraint(equalToConstant: 24),
-            
-            taskTitleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            taskTitleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            taskTitleLabel.trailingAnchor.constraint(equalTo: checkboxButton.leadingAnchor, constant: -8),
-            
-            taskTimeLabel.topAnchor.constraint(equalTo: taskTitleLabel.bottomAnchor, constant: 4),
-            taskTimeLabel.leadingAnchor.constraint(equalTo: taskTitleLabel.leadingAnchor),
-            taskTimeLabel.trailingAnchor.constraint(equalTo: taskTitleLabel.trailingAnchor),
-            taskTimeLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12)
-        ])
-        
+
+        checkboxButton.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview().offset(-16)
+            make.width.height.equalTo(32)
+        }
+
+        taskTitleLabel.snp.makeConstraints { make in
+            make.top.equalToSuperview().offset(12)
+            make.leading.equalToSuperview().offset(16)
+            make.trailing.equalTo(checkboxButton.snp.leading).offset(-8)
+        }
+
+        taskTimeLabel.snp.makeConstraints { make in
+            make.top.equalTo(taskTitleLabel.snp.bottom).offset(4)
+            make.leading.trailing.equalTo(taskTitleLabel)
+            make.bottom.equalToSuperview().offset(-12)
+        }
+
         checkboxButton.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
     }
     
@@ -95,6 +103,12 @@ class TaskCollectionViewCell: UICollectionViewCell {
         task.isCompleted = checkboxButton.isSelected
         task.time = task.isCompleted ? Date() : nil
         delegate?.didToggleTaskCompletion(task)
+        
+        if checkboxButton.isSelected {
+            checkboxButton.tintColor = .black
+        } else {
+            checkboxButton.tintColor = .black
+        }
     }
     
     func configure(with task: Task) {
