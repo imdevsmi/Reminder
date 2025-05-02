@@ -147,22 +147,30 @@ class NewTaskVC: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        view.backgroundColor = UIColor.clear
+        blurEffectView.frame = view.bounds
+        view.addSubview(blurEffectView)
+        view.addSubview(newTaskView)
+        newTaskView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.equalToSuperview().multipliedBy(0.90)
+            make.height.equalToSuperview().multipliedBy(0.40)
+        }
         setupUI()
     }
-
+    
     // MARK: - UI Setup (SnapKit)
     private func setupUI() {
         view.addSubview(blurEffectView)
         blurEffectView.frame = view.bounds
-
         view.addSubview(newTaskView)
         newTaskView.addSubview(contentVerticalStackView)
         view.addSubview(saveTaskButton)
         view.addSubview(taskDatePicker)
-
+        
         calendarStackView.addArrangedSubview(calenderIcon)
         calendarStackView.addArrangedSubview(dateLabel)
-        
         clockStackView.addArrangedSubview(clockIcon)
         clockStackView.addArrangedSubview(timeLabel)
         
@@ -171,7 +179,7 @@ class NewTaskVC: UIViewController {
         contentVerticalStackView.addArrangedSubview(calendarStackView)
         contentVerticalStackView.addArrangedSubview(clockStackView)
         contentVerticalStackView.addArrangedSubview(newTaskTextField)
-        
+
         newTaskView.snp.makeConstraints { make in
             make.center.equalToSuperview()
             make.width.equalToSuperview().multipliedBy(0.90)

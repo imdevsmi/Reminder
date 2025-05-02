@@ -20,6 +20,7 @@ class HomeVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        definesPresentationContext = true
         view.backgroundColor = .systemBackground
         setupUI()
 
@@ -68,7 +69,7 @@ class HomeVC: UIViewController {
 
     @objc func addButtonTapped() {
         let addTaskVC = NewTaskVC()
-        addTaskVC.modalPresentationStyle = .overFullScreen
+        addTaskVC.modalPresentationStyle = .overCurrentContext
         present(addTaskVC, animated: true, completion: nil)
     }
 
