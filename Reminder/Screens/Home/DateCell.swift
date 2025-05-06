@@ -5,6 +5,7 @@
 //  Created by Sami Gündoğan on 1.05.2025.
 //
 
+import SnapKit
 import UIKit
 
 class DateCell: UICollectionViewCell {
@@ -15,14 +16,14 @@ class DateCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.addSubview(dateLabel)
-        dateLabel.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            dateLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            dateLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-        ])
+
+        dateLabel.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+        }
+
         dateLabel.font = UIFont.systemFont(ofSize: 14)
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
