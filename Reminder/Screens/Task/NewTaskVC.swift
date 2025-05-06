@@ -117,9 +117,12 @@ class NewTaskVC: UIViewController {
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.text = "Sat, 29 March"
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.translatesAutoresizingMaskIntoConstraints = false
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE, dd MMMM"
+        label.text = formatter.string(from: Date()) 
+
         return label
     }()
     
