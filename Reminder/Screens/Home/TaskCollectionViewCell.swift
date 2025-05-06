@@ -49,7 +49,7 @@ class TaskCollectionViewCell: UICollectionViewCell {
         
         button.setImage(normalImage, for: .normal)
         button.setImage(selectedImage, for: .selected)
-        button.tintColor = .black // Tik atılmamış durumda siyah çember
+        button.tintColor = .black
         button.setPreferredSymbolConfiguration(normalConfig, forImageIn: .normal)
         button.setPreferredSymbolConfiguration(selectedConfig, forImageIn: .selected)
         

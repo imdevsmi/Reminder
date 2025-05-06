@@ -79,7 +79,10 @@ class NewTaskVC: UIViewController {
     private lazy var timeLabel: UILabel = {
         let label = UILabel()
         label.textColor = .label
-        label.text = "12:00 pm"
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        label.text = formatter.string(from: Date())
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.translatesAutoresizingMaskIntoConstraints = false
         
