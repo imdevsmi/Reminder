@@ -31,3 +31,13 @@ struct Task: Codable, Identifiable, Equatable {
         self.isCompleted = isCompleted
     }
 }
+
+extension Task {
+    var completedText: String {
+        guard isCompleted, let time = time else { return "" }
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return "completed in \(formatter.string(from: time))"
+    }
+}

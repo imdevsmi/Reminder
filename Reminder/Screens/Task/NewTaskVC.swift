@@ -5,8 +5,8 @@
 //  Created by Sami Gündoğan on 29.04.2025.
 //
 
-import UIKit
 import SnapKit
+import UIKit
 
 // MARK: - NewTaskVC
 class NewTaskVC: UIViewController {
@@ -217,16 +217,32 @@ class NewTaskVC: UIViewController {
         let date = taskDatePicker.date
         let time = taskDatePicker.date
 
-        guard !name.trimmingCharacters(in: .whitespaces).isEmpty else {
-            let alert = UIAlertController(title: "Missing Name", message: "Please enter a task name", preferredStyle: .alert)
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            let alert = UIAlertController(
+                title: "Missing Name",
+                message: "Please enter a task name",
+                preferredStyle: .alert
+            )
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
             return
         }
 
-        viewModelNewTask.addTask(name: name, detail: detail, date: date, time: time)
-        NotificationCenter.default.post(name: .didAddNewTask, object: nil)
-        dismiss(animated: true)
+        viewModelNewTask.addTask(name: name, detail: detail, date: date, time: time) { [weak self] newTask in
+            guard let self = self, let task = newTask else {
+                let errorAlert = UIAlertController(
+                    title: "Error",
+                    message: "Task could not be saved.",
+                    preferredStyle: .alert
+                )
+                errorAlert.addAction(UIAlertAction(title: "OK", style: .default))
+                self?.present(errorAlert, animated: true)
+                return
+            }
+
+            NotificationCenter.default.post(name: .didAddNewTask, object: task)
+            self.dismiss(animated: true)
+        }
     }
     
     @objc func showDatePicker() {

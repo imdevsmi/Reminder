@@ -5,8 +5,9 @@
 //  Created by Sami Gündoğan on 28.04.2025.
 //
 
-import UIKit
 import SnapKit
+import UIKit
+
 
 // MARK: - HomeVC
 
@@ -74,7 +75,7 @@ class HomeVC: UIViewController {
     }
 
     @objc private func calendarButtonTapped() {
-        // Future implementation
+        
     }
 
     // MARK: - UI Elements
@@ -236,14 +237,18 @@ extension HomeVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource
             formatter.dateFormat = "dd MMM"
             content.text = formatter.string(from: date)
             content.textProperties.alignment = .center
+            content.textProperties.lineBreakMode = .byClipping
             content.textProperties.numberOfLines = 1
 
             let isToday = Calendar.current.isDateInToday(date)
-            let isPast = date < Date().startOfDay()
+            _ = date < Date().startOfDay()
             let isSelected = Calendar.current.isDate(date, inSameDayAs: homeVM.selectedDate ?? Date())
-
-            if isToday {
+            
+            if isSelected {
                 content.textProperties.font = .boldSystemFont(ofSize: 16)
+                content.textProperties.color = .lightGray
+            } else if isToday {
+                content.textProperties.font = .systemFont(ofSize: 16)
                 content.textProperties.color = .black
             } else {
                 content.textProperties.font = .systemFont(ofSize: 16)
@@ -268,6 +273,8 @@ extension HomeVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource
             return CGSize(width: width, height: 52)
         }
     }
+    
+    
 }
 
 // MARK: - TaskCellDelegate

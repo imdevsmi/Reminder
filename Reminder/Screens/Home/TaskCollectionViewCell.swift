@@ -115,17 +115,7 @@ class TaskCollectionViewCell: UICollectionViewCell {
         self.task = task
         taskTitleLabel.text = task.title
         taskDescriptionLabel.text = task.notes
-        taskTimeLabel.text = ""
         checkboxButton.isSelected = task.isCompleted
-        
-        if task.isCompleted {
-            if let completionTime = task.time {
-                let formatter = DateFormatter()
-                formatter.dateFormat = "h:mm a"
-                taskTimeLabel.text = "completed in \(formatter.string(from: completionTime))"
-            }
-        } else {
-            taskTimeLabel.text = task.notes
-        }
+        taskTimeLabel.text = task.completedText
     }
 }
