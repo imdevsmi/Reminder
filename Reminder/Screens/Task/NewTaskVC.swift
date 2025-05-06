@@ -24,6 +24,7 @@ class NewTaskVC: UIViewController {
         view.layer.borderColor = UIColor.systemGray3.cgColor
         view.clipsToBounds = true
         view.translatesAutoresizingMaskIntoConstraints = false
+        
         return view
     }()
     
@@ -33,6 +34,7 @@ class NewTaskVC: UIViewController {
         stackView.alignment = .leading
         stackView.spacing = 8
         stackView.translatesAutoresizingMaskIntoConstraints = false
+        
         return stackView
     }()
     
@@ -42,6 +44,7 @@ class NewTaskVC: UIViewController {
         label.textColor = .black
         label.font = .systemFont(ofSize: 24, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
+        
         return label
     }()
     
@@ -51,6 +54,7 @@ class NewTaskVC: UIViewController {
         label.textColor = .black
         label.font = .systemFont(ofSize: 18, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
+        
         return label
     }()
     
@@ -59,6 +63,7 @@ class NewTaskVC: UIViewController {
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.translatesAutoresizingMaskIntoConstraints = false
+        
         return stackView
     }()
     
@@ -67,6 +72,7 @@ class NewTaskVC: UIViewController {
         imageView.contentMode = .scaleAspectFit
         imageView.tintColor = .label
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        
         return imageView
     }()
     
@@ -76,6 +82,7 @@ class NewTaskVC: UIViewController {
         label.text = "12:00 pm"
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.translatesAutoresizingMaskIntoConstraints = false
+        
         return label
     }()
     
@@ -88,6 +95,7 @@ class NewTaskVC: UIViewController {
         
         let recognizer = UITapGestureRecognizer(target: self, action: #selector(showDatePicker))
         stackView.addGestureRecognizer(recognizer)
+        
         return stackView
     }()
     
@@ -103,6 +111,7 @@ class NewTaskVC: UIViewController {
         picker.layer.borderWidth = 1
         picker.tintColor = .label
         picker.layer.cornerRadius = 8
+        
         return picker
     }()
     
@@ -111,6 +120,7 @@ class NewTaskVC: UIViewController {
         imageView.tintColor = .label
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        
         return imageView
     }()
     
@@ -121,8 +131,8 @@ class NewTaskVC: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         let formatter = DateFormatter()
         formatter.dateFormat = "EEE, dd MMMM"
-        label.text = formatter.string(from: Date()) 
-
+        label.text = formatter.string(from: Date())
+        
         return label
     }()
     
@@ -133,6 +143,7 @@ class NewTaskVC: UIViewController {
         textField.textColor = .secondaryLabel
         textField.font = .preferredFont(forTextStyle: .body)
         textField.translatesAutoresizingMaskIntoConstraints = false
+        
         return textField
     }()
     
@@ -144,12 +155,16 @@ class NewTaskVC: UIViewController {
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(saveTaskButtonTapped), for: .touchUpInside)
+        
         return button
     }()
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        view.addGestureRecognizer(tapGesture)
         
         view.backgroundColor = UIColor.clear
         blurEffectView.frame = view.bounds
@@ -182,7 +197,7 @@ class NewTaskVC: UIViewController {
         contentVerticalStackView.addArrangedSubview(calendarStackView)
         contentVerticalStackView.addArrangedSubview(clockStackView)
         contentVerticalStackView.addArrangedSubview(newTaskTextField)
-
+        
         newTaskView.snp.makeConstraints { make in
             make.center.equalToSuperview()
             make.width.equalToSuperview().multipliedBy(0.90)
@@ -219,7 +234,7 @@ class NewTaskVC: UIViewController {
         let detail: String? = nil
         let date = taskDatePicker.date
         let time = taskDatePicker.date
-
+        
         guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
             let alert = UIAlertController(
                 title: "Missing Name",
@@ -230,7 +245,7 @@ class NewTaskVC: UIViewController {
             present(alert, animated: true)
             return
         }
-
+        
         viewModelNewTask.addTask(name: name, detail: detail, date: date, time: time) { [weak self] newTask in
             guard let self = self, let task = newTask else {
                 let errorAlert = UIAlertController(
@@ -242,7 +257,7 @@ class NewTaskVC: UIViewController {
                 self?.present(errorAlert, animated: true)
                 return
             }
-
+            
             NotificationCenter.default.post(name: .didAddNewTask, object: task)
             self.dismiss(animated: true)
         }
@@ -250,5 +265,9 @@ class NewTaskVC: UIViewController {
     
     @objc func showDatePicker() {
         taskDatePicker.isHidden.toggle()
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
 }
