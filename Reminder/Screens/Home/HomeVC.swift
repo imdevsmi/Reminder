@@ -94,6 +94,7 @@ class HomeVC: UIViewController {
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell1")
         collectionView.backgroundColor = .systemBackground
         collectionView.showsHorizontalScrollIndicator = false
+        
         return collectionView
     }()
 
@@ -102,6 +103,7 @@ class HomeVC: UIViewController {
         label.font = .systemFont(ofSize: 28, weight: .bold)
         label.textColor = .label
         label.textAlignment = .left
+        
         return label
     }()
 
@@ -111,6 +113,7 @@ class HomeVC: UIViewController {
         let image = UIImage(systemName: "calendar", withConfiguration: config)
         button.setImage(image, for: .normal)
         button.tintColor = .label
+        
         return button
     }()
 
@@ -119,6 +122,7 @@ class HomeVC: UIViewController {
         stackView.axis = .horizontal
         stackView.spacing = 36
         stackView.alignment = .center
+        
         return stackView
     }()
 
@@ -138,6 +142,7 @@ class HomeVC: UIViewController {
         taskCollectionView.showsVerticalScrollIndicator = false
         taskCollectionView.collectionViewLayout.invalidateLayout()
         taskCollectionView.reloadData()
+        
         return taskCollectionView
     }()
 
@@ -152,6 +157,7 @@ class HomeVC: UIViewController {
         imageView.contentMode = .center
         imageView.isUserInteractionEnabled = true
         imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(addButtonTapped)))
+        
         return imageView
     }()
 
@@ -161,6 +167,7 @@ class HomeVC: UIViewController {
         label.font = .systemFont(ofSize: 15, weight: .semibold)
         label.textColor = .label
         label.textAlignment = .left
+        
         return label
     }()
 
@@ -169,11 +176,11 @@ class HomeVC: UIViewController {
     private func setupUI() {
         view.addSubview(dateCollectionView)
         view.addSubview(greetingStackView)
-        greetingStackView.addArrangedSubview(welcomeLabel)
-        greetingStackView.addArrangedSubview(calendarButton)
         view.addSubview(taskCollectionView)
         view.addSubview(addButton)
         view.addSubview(remindersTitleLabel)
+        greetingStackView.addArrangedSubview(welcomeLabel)
+        greetingStackView.addArrangedSubview(calendarButton)
 
         dateCollectionView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)

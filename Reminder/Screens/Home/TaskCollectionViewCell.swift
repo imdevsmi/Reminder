@@ -20,22 +20,23 @@ class TaskCollectionViewCell: UICollectionViewCell {
         label.textColor = .label
         label.numberOfLines = 0
         label.textAlignment = .left
+        
         return label
     }()
     
     private let taskTimeLabel: UILabel = {
-        
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .secondaryLabel
+        
         return label
     }()
     
     private let taskDescriptionLabel: UILabel = {
-        
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .regular)
         label.textColor = .secondaryLabel
+        
         return label
     }()
     
@@ -93,7 +94,6 @@ class TaskCollectionViewCell: UICollectionViewCell {
             make.leading.trailing.equalTo(taskTitleLabel)
             make.bottom.equalToSuperview().offset(-12)
         }
-
         checkboxButton.addTarget(self, action: #selector(checkboxTapped), for: .touchUpInside)
     }
     

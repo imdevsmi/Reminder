@@ -181,11 +181,11 @@ class NewTaskVC: UIViewController {
     // MARK: - UI Setup (SnapKit)
     private func setupUI() {
         view.addSubview(blurEffectView)
-        blurEffectView.frame = view.bounds
         view.addSubview(newTaskView)
-        newTaskView.addSubview(contentVerticalStackView)
         view.addSubview(saveTaskButton)
         view.addSubview(taskDatePicker)
+        blurEffectView.frame = view.bounds
+        newTaskView.addSubview(contentVerticalStackView)
         
         calendarStackView.addArrangedSubview(calenderIcon)
         calendarStackView.addArrangedSubview(dateLabel)
