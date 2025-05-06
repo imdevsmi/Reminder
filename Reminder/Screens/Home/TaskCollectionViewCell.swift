@@ -49,7 +49,10 @@ class TaskCollectionViewCell: UICollectionViewCell {
         
         button.setImage(normalImage, for: .normal)
         button.setImage(selectedImage, for: .selected)
-        button.tintColor = .black
+        button.tintColor = UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark ? .white : .black
+        }
+        
         button.setPreferredSymbolConfiguration(normalConfig, forImageIn: .normal)
         button.setPreferredSymbolConfiguration(selectedConfig, forImageIn: .selected)
         
@@ -117,5 +120,43 @@ class TaskCollectionViewCell: UICollectionViewCell {
         taskDescriptionLabel.text = task.notes
         checkboxButton.isSelected = task.isCompleted
         taskTimeLabel.text = task.completedText
+
+        // Metin renklerini ayarlama (gri ve kalın)
+        taskTitleLabel.textColor = UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark ? .lightGray : .gray
+        }
+        taskTitleLabel.font = UIFont.boldSystemFont(ofSize: 16) // Kalın
+
+        taskDescriptionLabel.textColor = UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark ? .lightGray : .gray
+        }
+        taskDescriptionLabel.font = UIFont.boldSystemFont(ofSize: 14) // Kalın
+
+        taskTimeLabel.textColor = UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark ? .lightGray : .gray
+        }
+        taskTimeLabel.font = UIFont.boldSystemFont(ofSize: 14) // Kalın
+
+        // Checkbox rengi (tik işareti ve çemberin içi)
+        checkboxButton.tintColor = UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark ? .white : .black
+        }
+
+        // Çemberin içi gri, tik siyah
+        let normalConfig = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium)
+        let normalImage = UIImage(systemName: "circle.fill", withConfiguration: normalConfig) // Gri çember
+
+        let selectedConfig = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium, scale: .medium)
+        let selectedImage = UIImage(systemName: "checkmark.circle.fill", withConfiguration: selectedConfig) // Siyah tik
+
+        checkboxButton.setImage(normalImage, for: .normal) // Normal durumda gri çember
+        checkboxButton.setImage(selectedImage, for: .selected) // Seçili durumda siyah tik
+        checkboxButton.setPreferredSymbolConfiguration(normalConfig, forImageIn: .normal)
+        checkboxButton.setPreferredSymbolConfiguration(selectedConfig, forImageIn: .selected)
+
+        // ContentView arka plan rengi (siyah kutucuk)
+        contentView.backgroundColor = UIColor { traitCollection in
+            traitCollection.userInterfaceStyle == .dark ? .darkGray : .lightGray // Daha belirgin kutucuklar
+        }
     }
 }

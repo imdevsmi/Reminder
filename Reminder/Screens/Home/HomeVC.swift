@@ -253,13 +253,13 @@ extension HomeVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource
             
             if isSelected {
                 content.textProperties.font = .boldSystemFont(ofSize: 16)
-                content.textProperties.color = .lightGray
+                content.textProperties.color = .label
             } else if isToday {
                 content.textProperties.font = .systemFont(ofSize: 16)
-                content.textProperties.color = .black
+                content.textProperties.color = .label
             } else {
                 content.textProperties.font = .systemFont(ofSize: 16)
-                content.textProperties.color = .lightGray
+                content.textProperties.color = .secondaryLabel
             }
 
             cell.contentConfiguration = content
