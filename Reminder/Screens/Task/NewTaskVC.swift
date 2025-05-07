@@ -334,7 +334,7 @@ class NewTaskVC: UIViewController {
     }
 }
 
-// MARK : - Extension
+// MARK: - Extensions
 
 extension UIColor {
     convenience init(hex: String) {
