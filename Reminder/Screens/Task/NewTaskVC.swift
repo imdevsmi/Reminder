@@ -18,10 +18,10 @@ class NewTaskVC: UIViewController {
     // MARK: - UI Elements
     private lazy var newTaskView: UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = .systemBackground
+        view.layer.borderColor = UIColor.separator.cgColor
         view.layer.cornerRadius = 16
         view.layer.borderWidth = 1
-        view.layer.borderColor = UIColor.systemGray3.cgColor
         view.clipsToBounds = true
         view.translatesAutoresizingMaskIntoConstraints = false
         
@@ -41,7 +41,7 @@ class NewTaskVC: UIViewController {
     private let newTaskLabel: UILabel = {
         let label = UILabel()
         label.text = "New Task"
-        label.textColor = .black
+        label.textColor = .label
         label.font = .systemFont(ofSize: 24, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -51,7 +51,7 @@ class NewTaskVC: UIViewController {
     private let dateTitleLabel: UILabel = {
         let label = UILabel()
         label.text = "Remind"
-        label.textColor = .black
+        label.textColor = .label
         label.font = .systemFont(ofSize: 18, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
         
@@ -143,8 +143,8 @@ class NewTaskVC: UIViewController {
         let textField = UITextField()
         textField.placeholder = "Here will be the text of the new task."
         textField.font = .systemFont(ofSize: 16, weight: .regular)
-        textField.textColor = .secondaryLabel
-        textField.font = .preferredFont(forTextStyle: .body)
+        textField.textColor = .label
+        textField.backgroundColor = .secondarySystemBackground
         textField.translatesAutoresizingMaskIntoConstraints = false
         
         return textField
@@ -153,8 +153,6 @@ class NewTaskVC: UIViewController {
     private lazy var saveTaskButton: UIButton = {
         let button = UIButton()
         button.setTitle("Save", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        button.backgroundColor = .black
         button.layer.cornerRadius = 8
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(saveTaskButtonTapped), for: .touchUpInside)
@@ -162,23 +160,55 @@ class NewTaskVC: UIViewController {
         return button
     }()
     
+    private lazy var addButton: UIImageView = {
+        let imageView = UIImageView()
+        let config = UIImage.SymbolConfiguration(pointSize: 56, weight: .regular)
+        let image = UIImage(systemName: "plus.circle.fill", withConfiguration: config)
+        imageView.image = image
+        imageView.tintColor = .label
+        imageView.backgroundColor = .systemBackground
+        imageView.layer.cornerRadius = 28
+        imageView.contentMode = .center
+        imageView.isUserInteractionEnabled = true
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(addButtonTapped)))
+        
+        return imageView
+    }()
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        updateSaveButtonStyle()
+        updateTextFieldStyle()
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
         
         view.backgroundColor = UIColor.clear
-        blurEffectView.frame = view.bounds
         view.addSubview(blurEffectView)
-        view.addSubview(newTaskView)
-        newTaskView.snp.makeConstraints { make in
-            make.center.equalToSuperview()
-            make.width.equalToSuperview().multipliedBy(0.90)
-            make.height.equalToSuperview().multipliedBy(0.40)
+        view.addSubview(addButton)
+        
+        blurEffectView.frame = view.bounds
+        addButton.snp.makeConstraints { make in
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.width.height.equalTo(55)
         }
+        
+        view.addSubview(addButton)
+        addButton.snp.makeConstraints { make in
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.width.height.equalTo(55)
+        }
+        
         setupUI()
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        updateSaveButtonStyle()
+        updateTextFieldStyle()
     }
     
     // MARK: - UI Setup (SnapKit)
@@ -222,6 +252,29 @@ class NewTaskVC: UIViewController {
             make.leading.equalTo(newTaskView)
             make.trailing.equalTo(newTaskView).offset(-48)
         }
+        
+        addButton.snp.makeConstraints { make in
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)  
+            make.width.height.equalTo(55)
+        }
+    }
+    
+    private func updateSaveButtonStyle() {
+        let isDark = traitCollection.userInterfaceStyle == .dark
+
+        if isDark {
+            saveTaskButton.backgroundColor = UIColor(hex: "#D9D9D9")
+            saveTaskButton.setTitleColor(.black, for: .normal)
+        } else {
+            saveTaskButton.backgroundColor = .black
+            saveTaskButton.setTitleColor(.white, for: .normal)
+        }
+    }
+    
+    private func updateTextFieldStyle() {
+        let isDark = traitCollection.userInterfaceStyle == .dark
+        newTaskTextField.textColor = isDark ? .white : .black
     }
     
     // MARK: - Actions
@@ -272,5 +325,31 @@ class NewTaskVC: UIViewController {
     
     @objc func dismissKeyboard() {
         view.endEditing(true)
+    }
+    
+    @objc func addButtonTapped() {
+        let addTaskVC = NewTaskVC()
+        addTaskVC.modalPresentationStyle = .overCurrentContext
+        present(addTaskVC, animated: true, completion: nil)
+    }
+}
+
+// MARK : - Extension
+
+extension UIColor {
+    convenience init(hex: String) {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        if hexSanitized.hasPrefix("#") {
+            hexSanitized.removeFirst()
+        }
+
+        var rgb: UInt64 = 0
+        Scanner(string: hexSanitized).scanHexInt64(&rgb)
+
+        let r = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
+        let g = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
+        let b = CGFloat(rgb & 0x0000FF) / 255.0
+
+        self.init(red: r, green: g, blue: b, alpha: 1.0)
     }
 }
