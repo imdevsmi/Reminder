@@ -79,19 +79,19 @@ class TaskCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(taskTitleLabel)
         contentView.addSubview(taskTimeLabel)
         contentView.addSubview(checkboxButton)
-
+        
         checkboxButton.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-16)
             make.width.height.equalTo(32)
         }
-
+        
         taskTitleLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(12)
             make.leading.equalToSuperview().offset(16)
             make.trailing.equalTo(checkboxButton.snp.leading).offset(-8)
         }
-
+        
         taskTimeLabel.snp.makeConstraints { make in
             make.top.equalTo(taskTitleLabel.snp.bottom).offset(4)
             make.leading.trailing.equalTo(taskTitleLabel)
@@ -116,47 +116,63 @@ class TaskCollectionViewCell: UICollectionViewCell {
     
     func configure(with task: Task) {
         self.task = task
+        let isDark = traitCollection.userInterfaceStyle == .dark
+        let isCompleted = task.isCompleted
+
+        // MARK: - Background & Border
+        contentView.layer.cornerRadius = 8
+        contentView.layer.borderWidth = 1
+        contentView.backgroundColor = isDark ? .black : .white
+
+        let borderColor: UIColor = {
+            if isDark {
+                return isCompleted
+                    ? UIColor.white.withAlphaComponent(0.3)
+                    : UIColor.white
+            } else {
+                return isCompleted
+                    ? UIColor.black.withAlphaComponent(0.3)
+                    : UIColor.black
+            }
+        }()
+        contentView.layer.borderColor = borderColor.cgColor
+
+        // MARK: - Labels
+        let textColor: UIColor = isDark
+            ? UIColor.white.withAlphaComponent(0.75)
+            : (isCompleted ? UIColor.black.withAlphaComponent(0.75) : UIColor.black)
+
+        let font = UIFont.systemFont(ofSize: 15, weight: .semibold)
+
+        [taskTitleLabel, taskDescriptionLabel, taskTimeLabel].forEach {
+            $0.textColor = textColor
+            $0.font = font
+        }
+
         taskTitleLabel.text = task.title
         taskDescriptionLabel.text = task.notes
-        checkboxButton.isSelected = task.isCompleted
         taskTimeLabel.text = task.completedText
 
-        // Metin renklerini ayarlama (gri ve kalın)
-        taskTitleLabel.textColor = UIColor { traitCollection in
-            traitCollection.userInterfaceStyle == .dark ? .lightGray : .gray
-        }
-        taskTitleLabel.font = UIFont.boldSystemFont(ofSize: 16) // Kalın
+        // MARK: - Checkbox Icon
+        let config = UIImage.SymbolConfiguration(pointSize: 31.5, weight: .semibold)
 
-        taskDescriptionLabel.textColor = UIColor { traitCollection in
-            traitCollection.userInterfaceStyle == .dark ? .lightGray : .gray
-        }
-        taskDescriptionLabel.font = UIFont.boldSystemFont(ofSize: 14) // Kalın
+        let (symbolName, tint): (String, UIColor) = {
+            if isCompleted {
+                let color = isDark
+                    ? UIColor.white.withAlphaComponent(0.75)
+                    : UIColor.black.withAlphaComponent(0.75)
+                return ("checkmark.circle.fill", color)
+            } else {
+                let color = isDark ? UIColor.white : UIColor.black
+                return ("circle", color)
+            }
+        }()
 
-        taskTimeLabel.textColor = UIColor { traitCollection in
-            traitCollection.userInterfaceStyle == .dark ? .lightGray : .gray
-        }
-        taskTimeLabel.font = UIFont.boldSystemFont(ofSize: 14) // Kalın
+        let iconImage = UIImage(systemName: symbolName, withConfiguration: config)?
+            .withRenderingMode(.alwaysOriginal)
+            .withTintColor(tint)
 
-        // Checkbox rengi (tik işareti ve çemberin içi)
-        checkboxButton.tintColor = UIColor { traitCollection in
-            traitCollection.userInterfaceStyle == .dark ? .white : .black
-        }
-
-        // Çemberin içi gri, tik siyah
-        let normalConfig = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium)
-        let normalImage = UIImage(systemName: "circle.fill", withConfiguration: normalConfig) // Gri çember
-
-        let selectedConfig = UIImage.SymbolConfiguration(pointSize: 28, weight: .medium, scale: .medium)
-        let selectedImage = UIImage(systemName: "checkmark.circle.fill", withConfiguration: selectedConfig) // Siyah tik
-
-        checkboxButton.setImage(normalImage, for: .normal) // Normal durumda gri çember
-        checkboxButton.setImage(selectedImage, for: .selected) // Seçili durumda siyah tik
-        checkboxButton.setPreferredSymbolConfiguration(normalConfig, forImageIn: .normal)
-        checkboxButton.setPreferredSymbolConfiguration(selectedConfig, forImageIn: .selected)
-
-        // ContentView arka plan rengi (siyah kutucuk)
-        contentView.backgroundColor = UIColor { traitCollection in
-            traitCollection.userInterfaceStyle == .dark ? .darkGray : .lightGray // Daha belirgin kutucuklar
-        }
+        checkboxButton.setImage(iconImage, for: .normal)
+        checkboxButton.setPreferredSymbolConfiguration(config, forImageIn: .normal)
     }
 }
