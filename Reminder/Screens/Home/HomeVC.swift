@@ -92,9 +92,10 @@ class HomeVC: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell1")
+        collectionView.register(DateCell.self, forCellWithReuseIdentifier: DateCell.identifier) 
         collectionView.backgroundColor = .systemBackground
         collectionView.showsHorizontalScrollIndicator = false
-        
+
         return collectionView
     }()
 
@@ -236,33 +237,11 @@ extension HomeVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == dateCollectionView {
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell1", for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DateCell.identifier, for: indexPath) as! DateCell
             let date = homeVM.availableDates[indexPath.item]
-
-            var content = UIListContentConfiguration.cell()
-            let formatter = DateFormatter()
-            formatter.dateFormat = "dd MMM"
-            content.text = formatter.string(from: date)
-            content.textProperties.alignment = .center
-            content.textProperties.lineBreakMode = .byClipping
-            content.textProperties.numberOfLines = 1
-
             let isToday = Calendar.current.isDateInToday(date)
-            _ = date < Date().startOfDay()
-            let isSelected = Calendar.current.isDate(date, inSameDayAs: homeVM.selectedDate ?? Date())
-            
-            if isSelected {
-                content.textProperties.font = .boldSystemFont(ofSize: 16)
-                content.textProperties.color = .label
-            } else if isToday {
-                content.textProperties.font = .systemFont(ofSize: 16)
-                content.textProperties.color = .label
-            } else {
-                content.textProperties.font = .systemFont(ofSize: 16)
-                content.textProperties.color = .secondaryLabel
-            }
 
-            cell.contentConfiguration = content
+            cell.configure(with: date, isToday: isToday)
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TaskCollectionViewCell.reuseIdentifier, for: indexPath) as! TaskCollectionViewCell
