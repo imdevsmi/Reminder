@@ -69,7 +69,7 @@ class DateCell: UICollectionViewCell {
 
     func configure(with date: Date, isToday: Bool) {
         let dayFormatter = DateFormatter()
-        dayFormatter.dateFormat = "EEE"
+        dayFormatter.dateFormat = "MMM"
         dayLabel.text = dayFormatter.string(from: date).uppercased()
 
         let dateFormatter = DateFormatter()
