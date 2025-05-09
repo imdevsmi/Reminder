@@ -108,9 +108,9 @@ class NewTaskVC: UIViewController {
         picker.isHidden = true
         picker.preferredDatePickerStyle = .inline
         picker.translatesAutoresizingMaskIntoConstraints = false
-        picker.backgroundColor = .green
+        picker.backgroundColor = .systemGray3
         picker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
-        picker.layer.borderColor = UIColor.red.cgColor
+        picker.layer.borderColor = UIColor.gray.cgColor
         picker.layer.borderWidth = 1
         picker.tintColor = .label
         picker.layer.cornerRadius = 8
