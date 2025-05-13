@@ -7,29 +7,28 @@
 
 import Foundation
 
-protocol HomeVMProtocol {
+protocol HomeVMProtocol: AnyObject {
     var greetingText: String { get }
     var availableDates: [Date] { get }
     var selectedDate: Date? { get set }
     var tasksForSelectedDate: [Task] { get }
     
     var onTasksUpdated: (() -> Void)? { get set }
-
-    func updateTask(_ task: Task)
+    
     func loadAvailableDates(for numberOfDays: Int)
     func updateSelectedDate(at index: Int)
     func loadTasksFromStorage()
     func addNewTask(_ task: Task)
+    func updateTask(_ task: Task)
     func deleteTask(with id: UUID)
 }
 
 final class HomeVM: HomeVMProtocol {
     
     // MARK: - Dependencies
-    
     var onTasksUpdated: (() -> Void)?
     private let storageService = TaskStorageService()
-    
+
     // MARK: - State
     private var allTasks: [Task] = [] {
         didSet {
@@ -45,7 +44,7 @@ final class HomeVM: HomeVMProtocol {
             updateTasksForSelectedDate()
         }
     }
-    
+
     var greetingText: String {
         let name = UserDefaults.standard.string(forKey: "userName") ?? "Sami"
         let hour = Calendar.current.component(.hour, from: Date())
@@ -58,47 +57,45 @@ final class HomeVM: HomeVMProtocol {
         }
         return "\(greeting) \(name)"
     }
-    
+
     // MARK: - Public Methods
-    
     func loadAvailableDates(for numberOfDays: Int) {
         let calendar = Calendar.current
         let today = Date()
         let startDay = calendar.date(byAdding: .day, value: -3, to: today)!
-        
+
         availableDates = (0..<(numberOfDays + 3)).compactMap {
             calendar.date(byAdding: .day, value: $0, to: startDay)
         }
     }
+
     func updateSelectedDate(at index: Int) {
         guard availableDates.indices.contains(index) else { return }
         selectedDate = availableDates[index]
     }
-    
+
     func loadTasksFromStorage() {
         allTasks = storageService.retrieve()
-        
-        if selectedDate != nil {
-            updateTasksForSelectedDate()
-        }
+        updateTasksForSelectedDate()
+        onTasksUpdated?()
     }
+
     func addNewTask(_ task: Task) {
         storageService.insert(task)
         loadTasksFromStorage()
     }
-    
+
     func updateTask(_ task: Task) {
         storageService.update(task)
         loadTasksFromStorage()
     }
-    
+
     func deleteTask(with id: UUID) {
         storageService.deleteTask(with: id)
         loadTasksFromStorage()
     }
-    
+
     // MARK: - Private
-    
     private func updateTasksForSelectedDate() {
         guard let selectedDate = selectedDate else {
             tasksForSelectedDate = []

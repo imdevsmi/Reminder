@@ -11,7 +11,7 @@ struct Task: Codable, Identifiable, Equatable {
     
     let id: UUID
     var title: String
-    var notes: String? // task detail
+    var notes: String? 
     var date: Date
     var time: Date?
     var isCompleted: Bool

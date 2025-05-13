@@ -5,8 +5,8 @@
 //  Created by Sami Gündoğan on 29.04.2025.
 //
 
-import UIKit
 import SnapKit
+import UIKit
 
 class TaskCollectionViewCell: UICollectionViewCell {
     
@@ -105,13 +105,20 @@ class TaskCollectionViewCell: UICollectionViewCell {
         guard var task = self.task else { return }
         task.isCompleted = checkboxButton.isSelected
         task.time = task.isCompleted ? Date() : nil
+        saveTaskState(task)
+
         delegate?.didToggleTaskCompletion(task)
-        
         if checkboxButton.isSelected {
             checkboxButton.tintColor = .black
         } else {
             checkboxButton.tintColor = .black
         }
+    }
+
+    private func saveTaskState(_ task: Task) {
+        let defaults = UserDefaults.standard
+        defaults.set(task.isCompleted, forKey: "\(task.id)_completed")
+        defaults.synchronize()
     }
     
     func configure(with task: Task) {
@@ -174,5 +181,6 @@ class TaskCollectionViewCell: UICollectionViewCell {
 
         checkboxButton.setImage(iconImage, for: .normal)
         checkboxButton.setPreferredSymbolConfiguration(config, forImageIn: .normal)
+        checkboxButton.isSelected = task.isCompleted
     }
 }

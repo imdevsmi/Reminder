@@ -179,6 +179,7 @@ class NewTaskVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        updateDateLabel(with: taskDatePicker.date)
         updateSaveButtonStyle()
         updateTextFieldStyle()
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
@@ -277,14 +278,16 @@ class NewTaskVC: UIViewController {
         newTaskTextField.textColor = isDark ? .white : .black
     }
     
-    // MARK: - Actions
-    @objc func dateChanged(_ sender: UIDatePicker) {
+    private func updateDateLabel(with date: Date) {
         let formatter = DateFormatter()
         formatter.dateFormat = "E, d MMMM"
-        dateLabel.text = formatter.string(from: sender.date)
-        taskDatePicker.date = sender.date
+        dateLabel.text = formatter.string(from: date)
     }
     
+    // MARK: - Actions
+    @objc func dateChanged(_ sender: UIDatePicker) {
+        updateDateLabel(with: sender.date)
+    }
     @objc private func saveTaskButtonTapped() {
         let name = newTaskTextField.text ?? ""
         let detail: String? = nil
@@ -320,7 +323,9 @@ class NewTaskVC: UIViewController {
     }
     
     @objc func showDatePicker() {
-        taskDatePicker.isHidden.toggle()
+        UIView.animate(withDuration: 0.25) {
+            self.taskDatePicker.isHidden.toggle()
+        }
     }
     
     @objc func dismissKeyboard() {

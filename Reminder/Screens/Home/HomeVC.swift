@@ -15,8 +15,12 @@ class HomeVC: UIViewController {
 
     // MARK: - Properties
 
-    private var homeVM: HomeVMProtocol = HomeVM()
-
+    private let homeVM: HomeVMProtocol = HomeVM()
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .didAddNewTask, object: nil)
+    }
+    
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -28,27 +32,10 @@ class HomeVC: UIViewController {
         NotificationCenter.default.addObserver(self, selector: #selector(handleNewTaskAdded), name: .didAddNewTask, object: nil)
 
         homeVM.onTasksUpdated = { [weak self] in
+            guard let self else { return }
             DispatchQueue.main.async {
-                self?.taskCollectionView.reloadData()
+                self.taskCollectionView.reloadData()
             }
-        }
-
-        homeVM.loadAvailableDates(for: 30)
-        homeVM.loadTasksFromStorage()
-        homeVM.updateSelectedDate(at: 0)
-
-        welcomeLabel.text = homeVM.greetingText
-        dateCollectionView.reloadData()
-        taskCollectionView.reloadData()
-
-        greetingStackView.addArrangedSubview(welcomeLabel)
-        greetingStackView.addArrangedSubview(calendarButton)
-        view.addSubview(greetingStackView)
-
-        greetingStackView.snp.makeConstraints { make in
-            make.top.equalTo(dateCollectionView.snp.bottom).offset(16)
-            make.leading.equalTo(view.snp.leading).offset(16)
-            make.trailing.lessThanOrEqualTo(view.snp.trailing).offset(-16)
         }
     }
 
@@ -182,18 +169,21 @@ class HomeVC: UIViewController {
         view.addSubview(remindersTitleLabel)
         greetingStackView.addArrangedSubview(welcomeLabel)
         greetingStackView.addArrangedSubview(calendarButton)
+        
+        homeVM.loadAvailableDates(for: 30)
+        homeVM.loadTasksFromStorage()
+        homeVM.updateSelectedDate(at: 0)
+
+        welcomeLabel.text = homeVM.greetingText
+        dateCollectionView.reloadData()
+        taskCollectionView.reloadData()
 
         dateCollectionView.snp.makeConstraints { make in
             make.top.equalTo(view.safeAreaLayoutGuide.snp.top).offset(16)
             make.leading.trailing.equalToSuperview().inset(0)
             make.height.equalTo(48)
         }
-
-        greetingStackView.snp.makeConstraints { make in
-            make.top.equalTo(dateCollectionView.snp.bottom).offset(2)
-            make.leading.trailing.equalToSuperview().inset(16)
-        }
-
+        
         taskCollectionView.snp.makeConstraints { make in
             make.top.equalTo(remindersTitleLabel.snp.bottom).offset(16)
             make.leading.trailing.equalToSuperview().inset(16)
@@ -209,6 +199,12 @@ class HomeVC: UIViewController {
         remindersTitleLabel.snp.makeConstraints { make in
             make.top.equalTo(welcomeLabel.snp.bottom).offset(16)
             make.leading.equalToSuperview().offset(33)
+        }
+        
+        greetingStackView.snp.makeConstraints { make in
+            make.top.equalTo(dateCollectionView.snp.bottom).offset(16)
+            make.leading.equalTo(view.snp.leading).offset(16)
+            make.trailing.lessThanOrEqualTo(view.snp.trailing).offset(-16)
         }
     }
 }
@@ -230,8 +226,8 @@ extension HomeVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource
             homeVM.updateSelectedDate(at: indexPath.item)
             taskCollectionView.reloadData()
         } else if collectionView == taskCollectionView {
-            let updateSelectedDate = homeVM.availableDates[indexPath.item]
-            print("Selected task: \(updateSelectedDate)")
+            let selectedTask = homeVM.tasksForSelectedDate[indexPath.item]
+            print("Selected task: \(selectedTask.title)")
         }
     }
 
@@ -268,7 +264,16 @@ extension HomeVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource
 extension HomeVC: TaskCellDelegate {
     func didToggleTaskCompletion(_ task: Task) {
         homeVM.updateTask(task)
-        taskCollectionView.reloadData()
+        if let selectedIndexPath = getIndexPath(for: task) {
+            taskCollectionView.reloadItems(at: [selectedIndexPath])
+        }
+    }
+    
+    private func getIndexPath(for task: Task) -> IndexPath? {
+        if let index = homeVM.tasksForSelectedDate.firstIndex(where: { $0.id == task.id }) {
+            return IndexPath(item: index, section: 0)
+        }
+        return nil
     }
 }
 
