@@ -25,47 +25,45 @@ protocol HomeVMProtocol: AnyObject {
 
 final class HomeVM: HomeVMProtocol {
     
-    // MARK: - Dependencies
+    // MARK: - Public Properties
+    
     var onTasksUpdated: (() -> Void)?
-    private let storageService = TaskStorageService()
-
-    // MARK: - State
-    private var allTasks: [Task] = [] {
-        didSet {
-            updateTasksForSelectedDate()
-        }
-    }
     
     private(set) var availableDates: [Date] = []
     private(set) var tasksForSelectedDate: [Task] = []
     
     var selectedDate: Date? {
-        didSet {
-            updateTasksForSelectedDate()
-        }
+        didSet { filterTasksForSelectedDate() }
     }
 
     var greetingText: String {
-        let name = UserDefaults.standard.string(forKey: "userName") ?? "Sami"
+        let name = UserDefaults.standard.string(forKey: "") ?? "Sami"
         let hour = Calendar.current.component(.hour, from: Date())
-        let greeting: String
+        
         switch hour {
-        case 6..<12: greeting = "Good Morning"
-        case 12..<17: greeting = "Good Afternoon"
-        case 17..<21: greeting = "Good Evening"
-        default: greeting = "Good Night"
+        case 6..<12: return "Good Morning \(name)"
+        case 12..<17: return "Good Afternoon \(name)"
+        case 17..<21: return "Good Evening \(name)"
+        default: return "Good Night \(name)"
         }
-        return "\(greeting) \(name)"
     }
+    
+    // MARK: - Private Properties
 
+    private var allTasks: [Task] = [] {
+        didSet { filterTasksForSelectedDate() }
+    }
+    
+    private let storageService = TaskStorageService()
+    
     // MARK: - Public Methods
+    
     func loadAvailableDates(for numberOfDays: Int) {
         let calendar = Calendar.current
-        let today = Date()
-        let startDay = calendar.date(byAdding: .day, value: -3, to: today)!
-
+        let startDate = calendar.date(byAdding: .day, value: -3, to: Date()) ?? Date()
+        
         availableDates = (0..<(numberOfDays + 3)).compactMap {
-            calendar.date(byAdding: .day, value: $0, to: startDay)
+            calendar.date(byAdding: .day, value: $0, to: startDate)
         }
     }
 
@@ -76,7 +74,6 @@ final class HomeVM: HomeVMProtocol {
 
     func loadTasksFromStorage() {
         allTasks = storageService.retrieve()
-        updateTasksForSelectedDate()
         onTasksUpdated?()
     }
 
@@ -95,9 +92,10 @@ final class HomeVM: HomeVMProtocol {
         loadTasksFromStorage()
     }
 
-    // MARK: - Private
-    private func updateTasksForSelectedDate() {
-        guard let selectedDate = selectedDate else {
+    // MARK: - Private Methods
+    
+    private func filterTasksForSelectedDate() {
+        guard let selectedDate else {
             tasksForSelectedDate = []
             return
         }

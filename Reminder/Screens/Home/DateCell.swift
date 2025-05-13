@@ -11,28 +11,43 @@ import UIKit
 class DateCell: UICollectionViewCell {
     static let identifier = "DateCell"
     
-    private let dayLabel = UILabel()
-    private let dateLabel = UILabel()
-    private let todayIndicator = UIView()
+    private let dayLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private let dateLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private let todayIndicator: UIView = {
+        let view = UIView()
+        view.backgroundColor = .label
+        return view
+    }()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
-        layoutViews()
-        styleViews()
+        setupLayout()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupViews() {
-        contentView.addSubview(dayLabel)
-        contentView.addSubview(dateLabel)
-        contentView.addSubview(todayIndicator)
+        [dayLabel, dateLabel, todayIndicator].forEach {
+            contentView.addSubview($0)
+        }
     }
     
-    private func layoutViews() {
+    private func setupLayout() {
         dayLabel.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(6)
             make.centerX.equalToSuperview()
@@ -46,19 +61,8 @@ class DateCell: UICollectionViewCell {
         todayIndicator.snp.makeConstraints { make in
             make.top.equalTo(dateLabel.snp.bottom).offset(4)
             make.centerX.equalToSuperview()
-            make.width.height.equalTo(6)
+            make.width.height.equalTo(12)
         }
-    }
-    
-    private func styleViews() {
-        dayLabel.font = .systemFont(ofSize: 12, weight: .medium)
-        dateLabel.font = .systemFont(ofSize: 16, weight: .bold)
-        
-        dayLabel.textAlignment = .center
-        dateLabel.textAlignment = .center
-        
-        todayIndicator.layer.cornerRadius = 3
-        todayIndicator.backgroundColor = .systemBlue
     }
     
     override var isSelected: Bool {
@@ -66,31 +70,19 @@ class DateCell: UICollectionViewCell {
             updateSelectionStyle()
         }
     }
-    
+
     func configure(with date: Date, isToday: Bool) {
-        let dayFormatter = DateFormatter()
-        dayFormatter.dateFormat = "MMM"
-        dayLabel.text = dayFormatter.string(from: date).uppercased()
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "d"
-        dateLabel.text = dateFormatter.string(from: date)
-        
+        dayLabel.text = date.formatted(.dateTime.month(.abbreviated)).uppercased()
+        dateLabel.text = date.formatted(.dateTime.day())
         todayIndicator.isHidden = !isToday
         updateSelectionStyle()
     }
     
     private func updateSelectionStyle() {
-        if isSelected {
-            contentView.backgroundColor = .label
-            dayLabel.textColor = .systemBackground
-            dateLabel.textColor = .systemBackground
-        } else {
-            contentView.backgroundColor = .clear
-            dayLabel.textColor = .label
-            dateLabel.textColor = .label
-        }
-        
+        let isDark = isSelected
+        contentView.backgroundColor = isDark ? .label : .clear
+        dayLabel.textColor = isDark ? .systemBackground : .label
+        dateLabel.textColor = isDark ? .systemBackground : .label
         contentView.layer.cornerRadius = 12
     }
 }
