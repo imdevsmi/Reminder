@@ -101,18 +101,13 @@ class TaskCollectionViewCell: UICollectionViewCell {
     }
     
     @objc private func checkboxTapped() {
+        checkboxButton.tintColor = .black
         checkboxButton.isSelected.toggle()
         guard var task = self.task else { return }
         task.isCompleted = checkboxButton.isSelected
         task.time = task.isCompleted ? Date() : nil
         saveTaskState(task)
-
         delegate?.didToggleTaskCompletion(task)
-        if checkboxButton.isSelected {
-            checkboxButton.tintColor = .black
-        } else {
-            checkboxButton.tintColor = .black
-        }
     }
 
     private func saveTaskState(_ task: Task) {
@@ -123,8 +118,12 @@ class TaskCollectionViewCell: UICollectionViewCell {
     
     func configure(with task: Task) {
         self.task = task
+        let persistedCompleted = UserDefaults.standard.bool(forKey: "\(task.id)_completed")
+        var updatedTask = task
+        updatedTask.isCompleted = persistedCompleted
+        
         let isDark = traitCollection.userInterfaceStyle == .dark
-        let isCompleted = task.isCompleted
+        let isCompleted = updatedTask.isCompleted
 
         // MARK: - Background & Border
         contentView.layer.cornerRadius = 8
@@ -156,9 +155,9 @@ class TaskCollectionViewCell: UICollectionViewCell {
             $0.font = font
         }
 
-        taskTitleLabel.text = task.title
-        taskDescriptionLabel.text = task.notes
-        taskTimeLabel.text = task.completedText
+        taskTitleLabel.text = updatedTask.title
+        taskDescriptionLabel.text = updatedTask.notes
+        taskTimeLabel.text = updatedTask.completedText
 
         // MARK: - Checkbox Icon
         let config = UIImage.SymbolConfiguration(pointSize: 31.5, weight: .semibold)
@@ -181,6 +180,6 @@ class TaskCollectionViewCell: UICollectionViewCell {
 
         checkboxButton.setImage(iconImage, for: .normal)
         checkboxButton.setPreferredSymbolConfiguration(config, forImageIn: .normal)
-        checkboxButton.isSelected = task.isCompleted
+        checkboxButton.isSelected = isCompleted
     }
 }

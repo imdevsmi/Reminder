@@ -97,7 +97,7 @@ class HomeVC: UIViewController {
 
     private let calendarButton: UIButton = {
         let button = UIButton(type: .system)
-        let config = UIImage.SymbolConfiguration(pointSize: 25, weight: .medium)
+        let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium)
         let image = UIImage(systemName: "calendar", withConfiguration: config)
         button.setImage(image, for: .normal)
         button.tintColor = .label
@@ -108,7 +108,7 @@ class HomeVC: UIViewController {
     private let greetingStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.spacing = 64
+        stackView.spacing = 36
         stackView.alignment = .center
         
         return stackView
