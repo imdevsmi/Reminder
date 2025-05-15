@@ -60,14 +60,13 @@ class NewTaskVC: UIViewController {
     
     private lazy var clockStackView: UIStackView = {
         let stackView = UIStackView()
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(showTimePicker))
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.isUserInteractionEnabled = true
-
-        let recognizer = UITapGestureRecognizer(target: self, action: #selector(showTimePicker))
         stackView.addGestureRecognizer(recognizer)
-
+        
         return stackView
     }()
     
@@ -82,9 +81,8 @@ class NewTaskVC: UIViewController {
     
     private lazy var timeLabel: UILabel = {
         let label = UILabel()
-        label.textColor = .label
-        
         let formatter = DateFormatter()
+        label.textColor = .label
         formatter.dateFormat = "h:mm a"
         label.text = formatter.string(from: Date())
         label.font = .systemFont(ofSize: 17, weight: .regular)
@@ -95,12 +93,11 @@ class NewTaskVC: UIViewController {
     
     private lazy var calendarStackView: UIStackView = {
         let stackView = UIStackView()
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(showDatePicker))
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.isUserInteractionEnabled = true
-        
-        let recognizer = UITapGestureRecognizer(target: self, action: #selector(showDatePicker))
         stackView.addGestureRecognizer(recognizer)
         
         return stackView
@@ -133,10 +130,10 @@ class NewTaskVC: UIViewController {
     
     private lazy var dateLabel: UILabel = {
         let label = UILabel()
+        let formatter = DateFormatter()
         label.textColor = .label
         label.font = .systemFont(ofSize: 17, weight: .regular)
         label.translatesAutoresizingMaskIntoConstraints = false
-        let formatter = DateFormatter()
         formatter.dateFormat = "EEE, dd MMMM"
         label.text = formatter.string(from: Date())
         
@@ -269,7 +266,7 @@ class NewTaskVC: UIViewController {
     
     private func updateSaveButtonStyle() {
         let isDark = traitCollection.userInterfaceStyle == .dark
-
+        
         if isDark {
             saveTaskButton.backgroundColor = UIColor(hex: "#D9D9D9")
             saveTaskButton.setTitleColor(.black, for: .normal)
@@ -293,7 +290,7 @@ class NewTaskVC: UIViewController {
     // MARK: - Actions
     @objc func dateChanged(_ sender: UIDatePicker) {
         updateDateLabel(with: sender.date)
-
+        
         let timeFormatter = DateFormatter()
         timeFormatter.dateFormat = "h:mm a"
         timeLabel.text = timeFormatter.string(from: sender.date)
@@ -369,14 +366,14 @@ extension UIColor {
         if hexSanitized.hasPrefix("#") {
             hexSanitized.removeFirst()
         }
-
+        
         var rgb: UInt64 = 0
         Scanner(string: hexSanitized).scanHexInt64(&rgb)
-
+        
         let r = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
         let g = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
         let b = CGFloat(rgb & 0x0000FF) / 255.0
-
+        
         self.init(red: r, green: g, blue: b, alpha: 1.0)
     }
 }
