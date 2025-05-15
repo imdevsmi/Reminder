@@ -22,7 +22,7 @@ class NewTaskVC: UIViewController {
         view.layer.borderColor = UIColor.separator.cgColor
         view.layer.cornerRadius = 16
         view.layer.borderWidth = 1
-        view.clipsToBounds = true
+        view.clipsToBounds = false
         view.translatesAutoresizingMaskIntoConstraints = false
         
         return view
@@ -63,7 +63,11 @@ class NewTaskVC: UIViewController {
         stackView.axis = .horizontal
         stackView.spacing = 8
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        
+        stackView.isUserInteractionEnabled = true
+
+        let recognizer = UITapGestureRecognizer(target: self, action: #selector(showTimePicker))
+        stackView.addGestureRecognizer(recognizer)
+
         return stackView
     }()
     
@@ -104,9 +108,9 @@ class NewTaskVC: UIViewController {
     
     private lazy var taskDatePicker: UIDatePicker = {
         let picker = UIDatePicker()
-        picker.datePickerMode = .date
+        picker.datePickerMode = .dateAndTime
         picker.isHidden = true
-        picker.preferredDatePickerStyle = .inline
+        picker.preferredDatePickerStyle = .wheels
         picker.translatesAutoresizingMaskIntoConstraints = false
         picker.backgroundColor = .systemGray3
         picker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
@@ -289,7 +293,12 @@ class NewTaskVC: UIViewController {
     // MARK: - Actions
     @objc func dateChanged(_ sender: UIDatePicker) {
         updateDateLabel(with: sender.date)
+
+        let timeFormatter = DateFormatter()
+        timeFormatter.dateFormat = "h:mm a"
+        timeLabel.text = timeFormatter.string(from: sender.date)
     }
+    
     @objc private func saveTaskButtonTapped() {
         let name = newTaskTextField.text ?? ""
         let detail: String? = nil
@@ -325,6 +334,13 @@ class NewTaskVC: UIViewController {
     }
     
     @objc func showDatePicker() {
+        UIView.animate(withDuration: 0.25) {
+            self.taskDatePicker.isHidden.toggle()
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    @objc private func showTimePicker() {
         UIView.animate(withDuration: 0.25) {
             self.taskDatePicker.isHidden.toggle()
         }
