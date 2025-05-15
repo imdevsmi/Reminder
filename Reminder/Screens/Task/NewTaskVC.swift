@@ -110,7 +110,7 @@ class NewTaskVC: UIViewController {
         let picker = UIDatePicker()
         picker.datePickerMode = .dateAndTime
         picker.isHidden = true
-        picker.preferredDatePickerStyle = .wheels
+        picker.preferredDatePickerStyle = .compact
         picker.translatesAutoresizingMaskIntoConstraints = false
         picker.backgroundColor = .systemGray3
         picker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
