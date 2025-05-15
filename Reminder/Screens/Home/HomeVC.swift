@@ -236,13 +236,14 @@ extension HomeVC: UICollectionViewDelegateFlowLayout, UICollectionViewDataSource
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DateCell.identifier, for: indexPath) as! DateCell
             let date = homeVM.availableDates[indexPath.item]
             let isToday = Calendar.current.isDateInToday(date)
-
             cell.configure(with: date, isToday: isToday)
+            
             return cell
         } else {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: TaskCollectionViewCell.reuseIdentifier, for: indexPath) as! TaskCollectionViewCell
             let task = homeVM.tasksForSelectedDate[indexPath.item]
             cell.configure(with: task)
+            cell.delegate = self
             return cell
         }
     }
