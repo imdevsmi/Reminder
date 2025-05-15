@@ -179,29 +179,17 @@ class NewTaskVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        view.addSubview(blurEffectView)
+        
         updateDateLabel(with: taskDatePicker.date)
         updateSaveButtonStyle()
         updateTextFieldStyle()
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
         
-        view.backgroundColor = UIColor.clear
-        view.addSubview(blurEffectView)
-        view.addSubview(addButton)
-        
-        blurEffectView.frame = view.bounds
-        addButton.snp.makeConstraints { make in
-            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
-            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
-            make.width.height.equalTo(55)
-        }
-        
-        view.addSubview(addButton)
-        addButton.snp.makeConstraints { make in
-            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
-            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
-            make.width.height.equalTo(55)
-        }
+        let blurTapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissSelf))
+        blurEffectView.isUserInteractionEnabled = true
+        blurEffectView.addGestureRecognizer(blurTapGesture)
         
         setupUI()
     }
@@ -214,10 +202,11 @@ class NewTaskVC: UIViewController {
     
     // MARK: - UI Setup (SnapKit)
     private func setupUI() {
-        view.addSubview(blurEffectView)
         view.addSubview(newTaskView)
         view.addSubview(saveTaskButton)
         view.addSubview(taskDatePicker)
+        view.addSubview(addButton)
+        view.backgroundColor = UIColor.clear
         blurEffectView.frame = view.bounds
         newTaskView.addSubview(contentVerticalStackView)
         
@@ -257,6 +246,19 @@ class NewTaskVC: UIViewController {
         addButton.snp.makeConstraints { make in
             make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)  
+            make.width.height.equalTo(55)
+        }
+        
+        blurEffectView.frame = view.bounds
+        addButton.snp.makeConstraints { make in
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.width.height.equalTo(55)
+        }
+        
+        addButton.snp.makeConstraints { make in
+            make.trailing.equalTo(view.safeAreaLayoutGuide).inset(16)
+            make.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
             make.width.height.equalTo(55)
         }
     }
@@ -336,6 +338,10 @@ class NewTaskVC: UIViewController {
         let addTaskVC = NewTaskVC()
         addTaskVC.modalPresentationStyle = .overCurrentContext
         present(addTaskVC, animated: true, completion: nil)
+    }
+    
+    @objc private func dismissSelf() {
+        dismiss(animated: true, completion: nil)
     }
 }
 
