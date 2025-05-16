@@ -13,30 +13,14 @@ class SplashViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        
         let imageView = UIImageView(image: UIImage(named: "splashreminder"))
         imageView.contentMode = .scaleAspectFit
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        
         view.addSubview(imageView)
-        imageView.snp.makeConstraints { make in
-            make.centerX.equalToSuperview()
-            make.centerY.equalToSuperview()
-            make.width.equalTo(200)
-            make.height.equalTo(200)
-        }
-        let label = UILabel()
-        label.text = "REMINDER"
-        label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-        label.textAlignment = .center
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.textColor = UIColor { traitCollection in
-            return traitCollection.userInterfaceStyle == .dark ? .white : .black
-        }
         
-        view.addSubview(label)
-        label.snp.makeConstraints { make in
-            make.top.equalTo(imageView.snp.bottom).offset(20)
-            make.centerX.equalToSuperview()
+        imageView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.width.height.equalTo(200)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
@@ -45,13 +29,15 @@ class SplashViewController: UIViewController {
     }
     
     private func transitionToMainScreen() {
+        guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let window = scene.windows.first(where: { $0.isKeyWindow }) else {
+            return
+        }
+
         let homeVC = HomeVC()
         let navigationController = UINavigationController(rootViewController: homeVC)
-        
-        if let window = UIApplication.shared.windows.first {
-            window.rootViewController = navigationController
-            window.makeKeyAndVisible()
-        }
+        window.rootViewController = navigationController
+        window.makeKeyAndVisible()
     }
 }
 
