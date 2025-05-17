@@ -10,6 +10,8 @@ import UIKit
 
 class SplashViewController: UIViewController {
     
+    private let viewModel : SplashVM = .init()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground

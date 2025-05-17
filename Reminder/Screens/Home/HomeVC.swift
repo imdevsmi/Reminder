@@ -8,7 +8,6 @@
 import SnapKit
 import UIKit
 
-
 // MARK: - HomeVC
 
 class HomeVC: UIViewController {
@@ -25,10 +24,10 @@ class HomeVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        definesPresentationContext = true
-        view.backgroundColor = .systemBackground
         setupUI()
 
+        navigationController?.isNavigationBarHidden = true
+        
         NotificationCenter.default.addObserver(self, selector: #selector(handleNewTaskAdded), name: .didAddNewTask, object: nil)
 
         homeVM.onTasksUpdated = { [weak self] in
@@ -54,19 +53,19 @@ class HomeVC: UIViewController {
     @objc private func handleNewTaskAdded() {
         homeVM.loadTasksFromStorage()
     }
-
+    
     @objc func addButtonTapped() {
         let addTaskVC = NewTaskVC()
         addTaskVC.modalPresentationStyle = .overCurrentContext
         present(addTaskVC, animated: true, completion: nil)
     }
-
+    
     @objc private func calendarButtonTapped() {
         
     }
-
+    
     // MARK: - UI Elements
-
+    
     private lazy var dateCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -162,6 +161,8 @@ class HomeVC: UIViewController {
     // MARK: - Layout
 
     private func setupUI() {
+        definesPresentationContext = true
+        view.backgroundColor = .systemBackground
         view.addSubview(dateCollectionView)
         view.addSubview(greetingStackView)
         view.addSubview(taskCollectionView)
