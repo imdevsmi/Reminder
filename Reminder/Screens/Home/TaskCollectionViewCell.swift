@@ -64,6 +64,8 @@ class TaskCollectionViewCell: UICollectionViewCell {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        observeTraitChanges()
         setupUI()
     }
     
@@ -114,6 +116,13 @@ class TaskCollectionViewCell: UICollectionViewCell {
         let defaults = UserDefaults.standard
         defaults.set(task.isCompleted, forKey: "\(task.id)_completed")
         defaults.synchronize()
+    }
+    
+    private func observeTraitChanges() {
+        registerForTraitChanges([UITraitUserInterfaceStyle.self], handler: { (cell: TaskCollectionViewCell, previousTraitCollection) in
+            guard let task = cell.task else { return }
+            cell.configure(with: task)
+        })
     }
     
     func configure(with task: Task) {
