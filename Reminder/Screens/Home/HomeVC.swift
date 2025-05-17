@@ -11,47 +11,6 @@ import UIKit
 // MARK: - HomeVC
 
 class HomeVC: UIViewController {
-
-    // MARK: - Properties
-
-    private let homeVM: HomeVMProtocol = HomeVM()
-    
-    deinit {
-        NotificationCenter.default.removeObserver(self, name: .didAddNewTask, object: nil)
-    }
-    
-    // MARK: - Lifecycle
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        setupUI()
-        observe()
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        taskCollectionView.reloadData()
-        homeVM.loadTasksFromStorage()
-        syncSelectedDateWithAvailableDates()
-    }
-
-    // MARK: - Selectors
-
-    @objc private func handleNewTaskAdded() {
-        homeVM.loadTasksFromStorage()
-    }
-    
-    @objc func addButtonTapped() {
-        let addTaskVC = NewTaskVC()
-        addTaskVC.modalPresentationStyle = .overCurrentContext
-        present(addTaskVC, animated: true, completion: nil)
-    }
-    
-    @objc private func calendarButtonTapped() {
-        
-    }
     
     // MARK: - UI Elements
     
@@ -67,7 +26,7 @@ class HomeVC: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "cell1")
-        collectionView.register(DateCell.self, forCellWithReuseIdentifier: DateCell.identifier) 
+        collectionView.register(DateCell.self, forCellWithReuseIdentifier: DateCell.identifier)
         collectionView.backgroundColor = .systemBackground
         collectionView.showsHorizontalScrollIndicator = false
 
@@ -147,6 +106,43 @@ class HomeVC: UIViewController {
         return label
     }()
 
+    // MARK: - Properties
+
+    private let homeVM: HomeVMProtocol = HomeVM()
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: .didAddNewTask, object: nil)
+    }
+    
+    // MARK: - Lifecycle
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        setupUI()
+        observe()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        taskCollectionView.reloadData()
+        homeVM.loadTasksFromStorage()
+        syncSelectedDateWithAvailableDates()
+    }
+
+    // MARK: - Selectors
+
+    @objc private func handleNewTaskAdded() {
+        homeVM.loadTasksFromStorage()
+    }
+    
+    @objc func addButtonTapped() {
+        let addTaskVC = NewTaskVC()
+        addTaskVC.modalPresentationStyle = .overCurrentContext
+        present(addTaskVC, animated: true, completion: nil)
+    }
+    
     // MARK: - Layout
 
     private func setupUI() {
