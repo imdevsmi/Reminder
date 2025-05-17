@@ -24,28 +24,17 @@ class HomeVC: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
-
-        navigationController?.isNavigationBarHidden = true
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleNewTaskAdded), name: .didAddNewTask, object: nil)
-
-        homeVM.onTasksUpdated = { [weak self] in
-            guard let self else { return }
-            DispatchQueue.main.async {
-                self.taskCollectionView.reloadData()
-            }
-        }
+        setupUI()
+        observe()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        homeVM.loadTasksFromStorage()
-        if let selectedDate = homeVM.selectedDate,
-           let index = homeVM.availableDates.firstIndex(where: { Calendar.current.isDate($0, inSameDayAs: selectedDate) }) {
-            homeVM.updateSelectedDate(at: index)
-        }
+        
         taskCollectionView.reloadData()
+        homeVM.loadTasksFromStorage()
+        syncSelectedDateWithAvailableDates()
     }
 
     // MARK: - Selectors
@@ -162,6 +151,7 @@ class HomeVC: UIViewController {
 
     private func setupUI() {
         definesPresentationContext = true
+        navigationController?.isNavigationBarHidden = true
         view.backgroundColor = .systemBackground
         view.addSubview(dateCollectionView)
         view.addSubview(greetingStackView)
@@ -206,6 +196,24 @@ class HomeVC: UIViewController {
             make.top.equalTo(dateCollectionView.snp.bottom).offset(16)
             make.leading.equalTo(view.snp.leading).offset(16)
             make.trailing.lessThanOrEqualTo(view.snp.trailing).offset(-16)
+        }
+    }
+    
+    func observe(){
+        NotificationCenter.default.addObserver(self, selector: #selector(handleNewTaskAdded), name: .didAddNewTask, object: nil)
+
+        homeVM.onTasksUpdated = { [weak self] in
+            guard let self else { return }
+            DispatchQueue.main.async {
+                self.taskCollectionView.reloadData()
+            }
+        }
+    }
+    
+    func syncSelectedDateWithAvailableDates(){
+        if let selectedDate = homeVM.selectedDate,
+           let index = homeVM.availableDates.firstIndex(where: { Calendar.current.isDate($0, inSameDayAs: selectedDate) }) {
+            homeVM.updateSelectedDate(at: index)
         }
     }
 }
