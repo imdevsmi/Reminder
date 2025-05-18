@@ -22,7 +22,8 @@ class SplashViewController: UIViewController {
         
         imageView.snp.makeConstraints { make in
             make.center.equalToSuperview()
-            make.width.height.equalTo(200)
+            make.width.equalToSuperview().multipliedBy(0.5)
+            make.height.equalTo(imageView.snp.width)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
